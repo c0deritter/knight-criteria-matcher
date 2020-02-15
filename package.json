@@ -1,9 +1,9 @@
 {
   "name": "mega-nice-db-query-parameter-matcher",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "main": "lib/matcher.js",
+  "types": "lib/matcher.d.ts",
   "files": [
     "lib/**/*"
   ],
