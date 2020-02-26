@@ -1,11 +1,15 @@
 import { DbCriteria } from 'mega-nice-db-query-parameter'
 
-export function criteriaMatch(obj: any, criteria?: DbCriteria): boolean {
+export function matchCriteria(obj: any, criteria: DbCriteria|undefined, fields: string[]): boolean {
   if (criteria == undefined) {
     return true
   }
 
-  for (let field in criteria) {
+  for (let field of fields) {
+    if (criteria[field] === undefined) {
+      continue
+    }
+
     let value = obj[field]
     let criterium = criteria[field]
     let operator = '='
@@ -31,7 +35,7 @@ export function criteriaMatch(obj: any, criteria?: DbCriteria): boolean {
           let subCriteria: any = {}
           subCriteria[field] = criterium
 
-          if (! criteriaMatch(obj, subCriteria)) {
+          if (! matchCriteria(obj, subCriteria, fields)) {
             return false
           }
         }
