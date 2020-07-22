@@ -1,6 +1,6 @@
 {
   "name": "mega-nice-db-query-parameter-matcher",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "",
   "main": "lib/matcher.js",
   "types": "lib/matcher.d.ts",
@@ -13,6 +13,7 @@
   "devDependencies": {
     "@types/chai": "^4.2.7",
     "@types/mocha": "^5.2.7",
+    "@types/node": "^14.0.24",
     "chai": "^4.2.0",
     "mocha": "^6.2.2",
     "ts-node": "^8.5.4",

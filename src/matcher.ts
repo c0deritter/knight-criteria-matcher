@@ -1,13 +1,17 @@
 import { DbCriteria } from 'mega-nice-db-query-parameter'
 
-export function matchCriteria(obj: any, criteria: DbCriteria|undefined, fields: string[]): boolean {
+export function matchCriteria(obj: any, criteria: DbCriteria|undefined): boolean {
   if (criteria == undefined) {
     return true
   }
 
-  for (let field of fields) {
-    if (criteria[field] === undefined) {
+  for (let field in criteria) {
+    if (field == 'orderBy' || field == 'limit' || field == 'offset') {
       continue
+    }
+
+    if (obj[field] === undefined) {
+      return false
     }
 
     let value = obj[field]
@@ -35,7 +39,7 @@ export function matchCriteria(obj: any, criteria: DbCriteria|undefined, fields: 
           let subCriteria: any = {}
           subCriteria[field] = criterium
 
-          if (! matchCriteria(obj, subCriteria, fields)) {
+          if (! matchCriteria(obj, subCriteria)) {
             return false
           }
         }
