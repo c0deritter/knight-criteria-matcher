@@ -119,4 +119,19 @@ describe('matchCriteria', function() {
     expect(matchCriteria({ a: 'a', b: 2 }, { a: ['a', 'b'], b: 1 })).to.be.false
     expect(matchCriteria({ a: 'b', b: 2 }, { a: ['a', 'b'], b: 1 })).to.be.false
   })
+
+  it('should match an array of objects', function() {
+    expect(matchCriteria({ a: [{ b: 2 }, { b: 1 }] }, { a: { b: 1 } })).to.be.true
+    expect(matchCriteria({ a: [{ b: 2 }, { b: 1 }] }, { a: { b: 3 } })).to.be.false
+  })
+
+  it('should match an object', function() {
+    expect(matchCriteria({ a: { b: 1 }}, { a: { b: 1 } })).to.be.true
+    expect(matchCriteria({ a: { b: 1 }}, { a: { b: 3 } })).to.be.false
+  })
+
+  it('should match an array inside an object', function() {
+    expect(matchCriteria({ a: { b: [{ c: 2 }, { c: 1 }] }}, { a: { b: { c: 1 }}})).to.be.true
+    expect(matchCriteria({ a: { b: [{ c: 2 }, { c: 1 }] }}, { a: { b: { c: 3 }}})).to.be.false
+  })
 })

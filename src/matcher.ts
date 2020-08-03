@@ -57,6 +57,20 @@ export function matchCriteria(obj: any, criteria: DbCriteria|undefined): boolean
       }
     }
     else {
+      if (value instanceof Array) {
+        for (let element of value) {
+          if (matchCriteria(element, criterium)) {
+            return true
+          }
+        }
+
+        return false
+      }
+
+      if (typeof value == 'object' && value !== null) {
+        return matchCriteria(value, criterium)
+      }
+
       switch (operator) {
         case '=':
           if (value !== criterium) {
