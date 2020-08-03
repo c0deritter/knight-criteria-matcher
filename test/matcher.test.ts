@@ -125,9 +125,19 @@ describe('matchCriteria', function() {
     expect(matchCriteria({ a: [{ b: 2 }, { b: 1 }] }, { a: { b: 3 } })).to.be.false
   })
 
+  it('should match the array count', function() {
+    expect(matchCriteria({ a: [{ b: 2 }, { b: 1 }] }, { a: { arrayCount: 2 } })).to.be.true
+    expect(matchCriteria({ a: [{ b: 2 }, { b: 1 }] }, { a: { arrayCount: 1 } })).to.be.false
+  })
+
   it('should match an object', function() {
     expect(matchCriteria({ a: { b: 1 }}, { a: { b: 1 } })).to.be.true
     expect(matchCriteria({ a: { b: 1 }}, { a: { b: 3 } })).to.be.false
+  })
+
+  it('should match an object inside an object', function() {
+    expect(matchCriteria({ a: { b: { c: 1 }}}, { a: { b: { c: 1 }}})).to.be.true
+    expect(matchCriteria({ a: { b: { c: 1 }}}, { a: { b: { c: 3 }}})).to.be.false
   })
 
   it('should match an array inside an object', function() {

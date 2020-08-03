@@ -6,7 +6,7 @@ export function matchCriteria(obj: any, criteria: DbCriteria|undefined): boolean
   }
 
   for (let field in criteria) {
-    if (field == 'orderBy' || field == 'limit' || field == 'offset') {
+    if (field == 'orderBy' || field == 'limit' || field == 'offset' || field == 'arrayCount') {
       continue
     }
 
@@ -17,6 +17,33 @@ export function matchCriteria(obj: any, criteria: DbCriteria|undefined): boolean
     let value = obj[field]
     let criterium = criteria[field]
     let operator = '='
+
+    if (value instanceof Array) {
+      let arrayCountMatched: boolean|undefined = undefined
+
+      if (typeof criterium == 'object' && 'arrayCount' in criterium) {
+        arrayCountMatched = matchValue(value.length, criterium.arrayCount, operator)
+      }
+
+      if (arrayCountMatched === false) {
+        return false
+      }
+
+      let oneMatched = false
+
+      for (let element of value) {
+        if (matchCriteria(element, criterium)) {
+          oneMatched = true
+          break
+        }
+      }
+
+      return oneMatched && (arrayCountMatched !== undefined ? arrayCountMatched : true)
+    }
+
+    if (typeof value == 'object' && value !== null) {
+      return matchCriteria(value, criterium)
+    }
 
     if (typeof criterium == 'object' && criterium !== null && typeof criterium.operator == 'string' && criterium.value !== undefined) {
       operator = (<string>criterium.operator).toUpperCase()
@@ -32,7 +59,7 @@ export function matchCriteria(obj: any, criteria: DbCriteria|undefined): boolean
     }
 
     if (criterium instanceof Array) {
-      let oneTrue: boolean|undefined = undefined
+      let oneMatched: boolean|undefined = undefined
 
       for (criterium of criterium) {
         if (typeof criterium == 'object' && criterium !== null && typeof criterium.operator == 'string' && criterium.value !== undefined) {
@@ -44,110 +71,102 @@ export function matchCriteria(obj: any, criteria: DbCriteria|undefined): boolean
           }
         }
         else {
-          oneTrue = false
+          oneMatched = false
           if (value === criterium) {
-            oneTrue = true
+            oneMatched = true
             break
           }
         }
       }
 
-      if (oneTrue === false) {
+      if (oneMatched === false) {
         return false
       }
     }
     else {
-      if (value instanceof Array) {
-        for (let element of value) {
-          if (matchCriteria(element, criterium)) {
-            return true
-          }
-        }
+      return matchValue(value, criterium, operator)
+    }
+  }
 
+  return true
+}
+
+export function matchValue(value: any, criterium: any, operator: string = '='): boolean {
+  switch (operator) {
+    case '=':
+      if (value !== criterium) {
         return false
       }
+      break
 
-      if (typeof value == 'object' && value !== null) {
-        return matchCriteria(value, criterium)
+    case '>':
+      if (value <= criterium) {
+        return false
       }
+      break
 
-      switch (operator) {
-        case '=':
-          if (value !== criterium) {
-            return false
-          }
-          break
-
-        case '>':
-          if (value <= criterium) {
-            return false
-          }
-          break
-
-        case '>=':
-          if (value < criterium) {
-            return false
-          }
-          break
-    
-        case '<':
-          if (value >= criterium) {
-            return false
-          }
-          break
-  
-        case '<=':
-          if (value > criterium) {
-            return false
-          }
-          break
-    
-        case '<>':
-        case '!=':
-          if (value === criterium) {
-            return false
-          }
-          break
-
-        case 'IN':
-          if (criterium.value instanceof Array && criterium.value.indexOf(value) == -1) {
-            return false
-          }
-          break
-
-        case 'IS':
-          if (value !== null) {
-            return false
-          }
-          break
-
-        case 'IS NOT':
-          if (value === null) {
-            return false
-          }
-          break
-
-        case 'LIKE':
-          if (typeof criterium == 'string' && typeof value == 'string') {
-            let regex = '^' + criterium.toLowerCase().replace(/%/g, '.*') + '$'
-
-            if (value.search(regex) == -1) {
-              return false
-            }
-          }
-          break
-
-        case 'ILIKE':
-          if (typeof criterium == 'string' && typeof value == 'string') {
-            let regex = '^' + criterium.toLowerCase().replace(/%/g, '.*') + '$'
-            
-            if (value.toLowerCase().search(regex) == -1) {
-              return false
-            }
-          }
-          break
+    case '>=':
+      if (value < criterium) {
+        return false
       }
-    }
+      break
+
+    case '<':
+      if (value >= criterium) {
+        return false
+      }
+      break
+
+    case '<=':
+      if (value > criterium) {
+        return false
+      }
+      break
+
+    case '<>':
+    case '!=':
+      if (value === criterium) {
+        return false
+      }
+      break
+
+    case 'IN':
+      if (criterium.value instanceof Array && criterium.value.indexOf(value) == -1) {
+        return false
+      }
+      break
+
+    case 'IS':
+      if (value !== null) {
+        return false
+      }
+      break
+
+    case 'IS NOT':
+      if (value === null) {
+        return false
+      }
+      break
+
+    case 'LIKE':
+      if (typeof criterium == 'string' && typeof value == 'string') {
+        let regex = '^' + criterium.toLowerCase().replace(/%/g, '.*') + '$'
+
+        if (value.search(regex) == -1) {
+          return false
+        }
+      }
+      break
+
+    case 'ILIKE':
+      if (typeof criterium == 'string' && typeof value == 'string') {
+        let regex = '^' + criterium.toLowerCase().replace(/%/g, '.*') + '$'
+        
+        if (value.toLowerCase().search(regex) == -1) {
+          return false
+        }
+      }
+      break
   }
 
   return true
