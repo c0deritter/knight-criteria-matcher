@@ -1,6 +1,6 @@
 import { DbCriteria } from 'mega-nice-db-query-parameter'
 
-export function matchCriteria(obj: any, criteria: DbCriteria|undefined): boolean {
+export function matchCriteria(obj: any, criteria: DbCriteria|undefined, customMatcher?: CustomMatcher): boolean {
   if (criteria == undefined) {
     return true
   }
@@ -84,6 +84,32 @@ export function matchCriteria(obj: any, criteria: DbCriteria|undefined): boolean
       }
     }
     else {
+      let fieldMatcher = undefined
+
+      if (customMatcher != undefined) {
+        let className: string
+
+        if (obj.className != undefined) {  
+          className = obj.className
+        }
+        else {
+          className = obj.constructor.name
+        }
+
+        let customMatcherForClass = customMatcher[className]
+
+        for (let matcher of customMatcherForClass) {
+          if (matcher.field == field) {
+            fieldMatcher = matcher
+            break
+          }
+        }
+      }
+
+      if (fieldMatcher != undefined) {
+        return fieldMatcher.match(obj, criterium)
+      }
+
       return matchValue(value, criterium, operator)
     }
   }
@@ -170,4 +196,11 @@ export function matchValue(value: any, criterium: any, operator: string = '='): 
   }
 
   return true
+}
+
+export interface CustomMatcher {
+  [className: string]: {
+      field: string,
+      match: (obj: any, criterium: any) => boolean
+    }[]
 }

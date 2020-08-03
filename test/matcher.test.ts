@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import 'mocha'
-import { matchCriteria } from '../src/matcher'
+import { matchCriteria, CustomMatcher } from '../src/matcher'
 
 describe('matchCriteria', function() {
   it('should match an implicit = operator', function() {
@@ -143,5 +143,19 @@ describe('matchCriteria', function() {
   it('should match an array inside an object', function() {
     expect(matchCriteria({ a: { b: [{ c: 2 }, { c: 1 }] }}, { a: { b: { c: 1 }}})).to.be.true
     expect(matchCriteria({ a: { b: [{ c: 2 }, { c: 1 }] }}, { a: { b: { c: 3 }}})).to.be.false
+  })
+
+  it('should use a custom matcher based on className property', function() {
+    let customMatcher: CustomMatcher = {
+      'A': [
+        {
+          field: 'a',
+          match: (obj: any, criterium: number) => obj.a.indexOf(criterium) > -1
+        }
+      ]
+    }
+
+    expect(matchCriteria({ className: 'A', a: '123' }, { a: '1' }, customMatcher)).to.be.true
+    expect(matchCriteria({ className: 'A', a: '123' }, { a: '4' }, customMatcher)).to.be.false
   })
 })
