@@ -125,9 +125,13 @@ describe('matchCriteria', function() {
     expect(matchCriteria({ a: [{ b: 2 }, { b: 1 }] }, { a: { b: 3 } })).to.be.false
   })
 
-  it('should match the array count', function() {
-    expect(matchCriteria({ a: [{ b: 2 }, { b: 1 }] }, { a: { arrayCount: 2 } })).to.be.true
-    expect(matchCriteria({ a: [{ b: 2 }, { b: 1 }] }, { a: { arrayCount: 1 } })).to.be.false
+  it('should match the array length', function() {
+    expect(matchCriteria({ a: [{ b: 2 }, { b: 1 }] }, { a: { arrayLength: 2 }})).to.be.true
+    expect(matchCriteria({ a: [{ b: 2 }, { b: 1 }] }, { a: { arrayLength: 1 }})).to.be.false
+    expect(matchCriteria({ a: [{ b: 2 }, { b: 1 }] }, { a: { arrayLength: 0 }})).to.be.false
+    expect(matchCriteria({ a: [] }, { a: { arrayLength: 0 }})).to.be.true
+    expect(matchCriteria({ a: null }, { a: { arrayLength: 0 }})).to.be.true
+    expect(matchCriteria({ a: undefined }, { a: { arrayLength: 0 }})).to.be.true
   })
 
   it('should match an object', function() {

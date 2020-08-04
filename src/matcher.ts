@@ -6,39 +6,40 @@ export function matchCriteria(obj: any, criteria: DbCriteria|undefined, customMa
   }
 
   for (let field in criteria) {
-    if (field == 'orderBy' || field == 'limit' || field == 'offset' || field == 'arrayCount') {
+    if (field == 'orderBy' || field == 'limit' || field == 'offset' || field == 'arrayLength') {
       continue
-    }
-
-    if (obj[field] === undefined) {
-      return false
     }
 
     let value = obj[field]
     let criterium = criteria[field]
-    let operator = '='
+    let operator: string|undefined = undefined
+
+    if (value == undefined && criterium !== null && typeof criterium == 'object' && 'arrayLength' in criterium) {
+      return true
+    }
+
+    if (value === undefined) {
+      return false
+    }
 
     if (value instanceof Array) {
-      let arrayCountMatched: boolean|undefined = undefined
+      let arrayLengthMatched: boolean|undefined = undefined
 
-      if (typeof criterium == 'object' && 'arrayCount' in criterium) {
-        arrayCountMatched = matchValue(value.length, criterium.arrayCount, operator)
+      if (typeof criterium == 'object' && 'arrayLength' in criterium) {
+        arrayLengthMatched = matchValue(value.length, criterium.arrayLength)
       }
 
-      if (arrayCountMatched === false) {
+      if (arrayLengthMatched === false) {
         return false
       }
 
-      let oneMatched = false
-
       for (let element of value) {
         if (matchCriteria(element, criterium)) {
-          oneMatched = true
-          break
+          return true
         }
       }
 
-      return oneMatched && (arrayCountMatched !== undefined ? arrayCountMatched : true)
+      return arrayLengthMatched !== undefined ? true : false
     }
 
     if (typeof value == 'object' && value !== null) {
@@ -117,85 +118,53 @@ export function matchCriteria(obj: any, criteria: DbCriteria|undefined, customMa
   return true
 }
 
-export function matchValue(value: any, criterium: any, operator: string = '='): boolean {
-  switch (operator) {
-    case '=':
-      if (value !== criterium) {
-        return false
-      }
-      break
+export function matchValue(value: any, criterium: any, operator?: string): boolean {
+  if (operator == undefined || operator == '=') {
+    return value === criterium
+  }
 
+  switch (operator) {
     case '>':
-      if (value <= criterium) {
-        return false
-      }
-      break
+      return value > criterium
 
     case '>=':
-      if (value < criterium) {
-        return false
-      }
-      break
+      return value >= criterium
 
     case '<':
-      if (value >= criterium) {
-        return false
-      }
-      break
+      return value < criterium
 
     case '<=':
-      if (value > criterium) {
-        return false
-      }
-      break
+      return value <= criterium
 
     case '<>':
     case '!=':
-      if (value === criterium) {
-        return false
-      }
-      break
+      return value !== criterium
 
     case 'IN':
-      if (criterium.value instanceof Array && criterium.value.indexOf(value) == -1) {
-        return false
-      }
-      break
+      return criterium.value instanceof Array && criterium.value.indexOf(value) > -1
 
     case 'IS':
-      if (value !== null) {
-        return false
-      }
-      break
+      return value === null
 
     case 'IS NOT':
-      if (value === null) {
-        return false
-      }
-      break
+      return value !== null
 
     case 'LIKE':
       if (typeof criterium == 'string' && typeof value == 'string') {
         let regex = '^' + criterium.toLowerCase().replace(/%/g, '.*') + '$'
-
-        if (value.search(regex) == -1) {
-          return false
-        }
+        return value.search(regex) > -1
       }
       break
 
     case 'ILIKE':
       if (typeof criterium == 'string' && typeof value == 'string') {
         let regex = '^' + criterium.toLowerCase().replace(/%/g, '.*') + '$'
-        
-        if (value.toLowerCase().search(regex) == -1) {
-          return false
-        }
+        return value.toLowerCase().search(regex) == -1
       }
       break
   }
 
-  return true
+  return false
 }
 
 export interface CustomMatcher {
