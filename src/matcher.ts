@@ -1,11 +1,15 @@
 import { DbCriteria } from 'mega-nice-db-query-parameter'
 
 export function matchCriteria(obj: any, criteria: DbCriteria|undefined, customMatcher?: CustomMatcher): boolean {
+  // console.log('obj', obj)
+  // console.log('criteria', criteria)
+
   if (criteria == undefined) {
     return true
   }
 
   for (let field in criteria) {
+    // console.log('field', field)
     if (field == 'orderBy' || field == 'limit' || field == 'offset' || field == 'arrayLength') {
       continue
     }
@@ -13,11 +17,15 @@ export function matchCriteria(obj: any, criteria: DbCriteria|undefined, customMa
     let value = obj[field]
     let criterium = criteria[field]
     let operator: string|undefined = undefined
+    // the value is assumed to be an array as soon as the correspoding criterium contains the arrayLength property
+    let criteriumContainsArrayLength = criterium !== null && typeof criterium == 'object' && 'arrayLength' in criterium
 
-    if (value == undefined && criterium !== null && typeof criterium == 'object' && 'arrayLength' in criterium) {
-      return true
-    }
+    // console.log('value', value)
+    // console.log('criterium', criterium)
+    // console.log('operator', operator)
+    // console.log('criteriumContainsArrayLength', criteriumContainsArrayLength)
 
+    // look if there is a custom matcher for the given class/field combination
     if (customMatcher != undefined) {
       let className: string
       
@@ -28,89 +36,151 @@ export function matchCriteria(obj: any, criteria: DbCriteria|undefined, customMa
         className = obj.constructor.name
       }
       
-      let customMatcherForClass = customMatcher[className]
+      let customMatchersForClass = customMatcher[className]
       
       let fieldMatcher = undefined
-      for (let matcher of customMatcherForClass) {
+      for (let matcher of customMatchersForClass) {
         if (matcher.field == field) {
           fieldMatcher = matcher
           break
         }
       }
 
+      // console.log('fieldMatcher', fieldMatcher)
+
+      // if there is a field matcher and it does not match then return false. otherwise just continue to the
+      // next criteria.
       if (fieldMatcher != undefined) {
-        return fieldMatcher.match(obj, criterium)
+        if (! fieldMatcher.match(obj, criterium)) {
+          // console.log('Custom field matcher did not match. Returning false...')
+          return false
+        }
+        else {
+          // console.log('Custom field matcher did match. Continuing...')
+          continue
+        }
       }
     }
 
-    if (value === undefined) {
+    // if the value is exactly undefined and the value is not supposed to be an array then we can return false
+    // because an undefined value cannot be checked against anything valid.
+    if (value === undefined && ! criteriumContainsArrayLength) {
+      // console.log('Value is undefined and not ought to be an array. Returning false...')
       return false
     }
-
+    
+    // if the value is an array go through the elements of that array one by one looking for at least one match
     if (value instanceof Array) {
-      let arrayLengthMatched: boolean|undefined = undefined
-
+      // console.log('Value is of type array')
+      // if the array is empty we cannot match anything thus no criterium will match. Just return false in this case.
+      // check if there is an arrayLength property which we have to evaluate manually
       if (typeof criterium == 'object' && 'arrayLength' in criterium) {
-        arrayLengthMatched = matchValue(value.length, criterium.arrayLength)
-      }
+        if (! matchValue(value.length, criterium.arrayLength)) {
+          return false
+        }
 
-      if (arrayLengthMatched === false) {
-        return false
-      }
+        // clone criterium and remove arrayLength
+        criterium = { ...criterium }
+        delete criterium.arrayLength
 
-      for (let element of value) {
-        if (matchCriteria(element, criterium)) {
-          return true
+        // console.log('cloned criterium', criterium)
+
+        // if there is nothing else to check apart from the array length continue
+        if (Object.keys(criterium).length == 0) {
+          // console.log('Criterium is empty. Continuing...')
+          continue
         }
       }
 
-      return arrayLengthMatched !== undefined ? true : false
+      // if there was an arrayLength and we are still here that means that the length was correct.
+      // now check if there is at least one element that matches.
+      let atLeastOneElementMatched = false
+
+      for (let element of value) {
+        if (matchCriteria(element, criterium)) {
+          atLeastOneElementMatched = true
+          break
+        }
+      }
+
+      // console.log('atLeastOneElementMatched', atLeastOneElementMatched)
+
+      // if not one element matched we can return false
+      if (! atLeastOneElementMatched) {
+        return false
+      }
+      else {
+        continue
+      }
+    }
+    // if the value should have been an array but it is not we return false if the wished length was not 0
+    else if (criteriumContainsArrayLength) {
+      if (criterium.arrayLength !== 0) {
+        return false
+      }
+      else {
+        continue
+      }
     }
 
+    // if the value is an object we just go into the recursion
     if (typeof value == 'object' && value !== null) {
-      return matchCriteria(value, criterium)
+      if (! matchCriteria(value, criterium)) {
+        return false
+      }
+      else {
+        continue
+      }
     }
 
+    // if the criterium is an object then we assume it is one that has an operator and a value property and we
+    // set the corresponding variables accordingly
     if (typeof criterium == 'object' && criterium !== null && typeof criterium.operator == 'string' && criterium.value !== undefined) {
       operator = (<string>criterium.operator).toUpperCase()
       criterium = criterium.value
     }
 
+    // support a written NULL instead of the JavaScript null
     if (typeof criterium == 'string' && criterium.toUpperCase() == 'NULL') {
       criterium = null
     }
 
-    if (value === undefined) {
-      return false
-    }
-
+    // if the criterium is an array we assume that it is an array consisting of single values or objects
+    // that have the operator and value property
     if (criterium instanceof Array) {
-      let oneMatched: boolean|undefined = undefined
+      // console.log('Criterium is of type array')
 
-      for (criterium of criterium) {
-        if (typeof criterium == 'object' && criterium !== null && typeof criterium.operator == 'string' && criterium.value !== undefined) {
-          let subCriteria: any = {}
-          subCriteria[field] = criterium
+      // if the criterium is an array it might be that it consists of criterium objects
+      let consistsOfCriteriumObjects = false
+      for (let criteriumObj of criterium) {
+        if (typeof criteriumObj == 'object' && criteriumObj !== null && typeof criteriumObj.operator == 'string' && criteriumObj.value !== undefined) {
+          consistsOfCriteriumObjects = true
+          // console.log('Evaluating criterum object', criterium)
 
-          if (! matchCriteria(obj, subCriteria)) {
+          if (! matchValue(value, criteriumObj.value, criteriumObj.operator)) {
+            // console.log('Criterium did not match. Returning false...')
             return false
           }
         }
         else {
-          oneMatched = false
-          if (value === criterium) {
-            oneMatched = true
-            break
-          }
+          // if the first element was not a criterium object then we just stop the loop and assume
+          // that the array is an array of values designed to be used with the IN operator
+          // console.log('Criterium array is to be used with IN operator')
+          break
         }
       }
 
-      if (oneMatched === false) {
-        return false
+      // console.log('consistsOfCriteriumObjects', consistsOfCriteriumObjects)
+
+      if (! consistsOfCriteriumObjects) {
+        if (! matchValue(value, criterium)) {
+          // console.log('Criterium did not match. Returning false...')
+          return false
+        }
       }
     }
-    else {
-      return matchValue(value, criterium, operator)
+    else if (! matchValue(value, criterium, operator)) {
+      return false
     }
   }
 
@@ -118,6 +188,15 @@ export function matchCriteria(obj: any, criteria: DbCriteria|undefined, customMa
 }
 
 export function matchValue(value: any, criterium: any, operator?: string): boolean {
+  // console.log('Entering matchValue...')
+  // console.log('matchValue > value', value)
+  // console.log('matchValue > criterium', criterium)
+  // console.log('matchValue > operator', operator)
+
+  if (criterium instanceof Array && operator == undefined) {
+    operator = 'IN'
+  }
+
   if (operator == undefined || operator == '=') {
     return value === criterium
   }
@@ -140,7 +219,7 @@ export function matchValue(value: any, criterium: any, operator?: string): boole
       return value !== criterium
 
     case 'IN':
-      return criterium.value instanceof Array && criterium.value.indexOf(value) > -1
+      return criterium instanceof Array && criterium.indexOf(value) > -1
 
     case 'IS':
       return value === null

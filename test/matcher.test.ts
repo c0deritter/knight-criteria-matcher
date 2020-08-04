@@ -6,20 +6,20 @@ describe('matchCriteria', function() {
   it('should match an implicit = operator', function() {
     expect(matchCriteria({ a: 'a' }, { a: 'a' })).to.be.true
     expect(matchCriteria({ a: 'a' }, { a: 'b' })).to.be.false
-    expect(matchCriteria({ }, { a: 'a' })).to.be.false
+    expect(matchCriteria({}, { a: 'a' })).to.be.false
   })
 
   it('should match an implicit = operator', function() {
     expect(matchCriteria({ a: 'a' }, { a: 'a' })).to.be.true
     expect(matchCriteria({ a: 'a' }, { a: 'b' })).to.be.false
-    expect(matchCriteria({ }, { a: 'a' })).to.be.false
+    expect(matchCriteria({}, { a: 'a' })).to.be.false
   })
 
   it('should match an implicit = operator involving null', function() {
     expect(matchCriteria({ a: null }, { a: null })).to.be.true
     expect(matchCriteria({ a: null }, { a: 'NULL' })).to.be.true
-    expect(matchCriteria({ }, { a: null })).to.be.false
-    expect(matchCriteria({ }, { a: 'NULL' })).to.be.false
+    expect(matchCriteria({}, { a: null })).to.be.false
+    expect(matchCriteria({}, { a: 'NULL' })).to.be.false
     expect(matchCriteria({ a: 'a' }, { a: null })).to.be.false
     expect(matchCriteria({ a: 'a' }, { a: 'NULL' })).to.be.false
   })
@@ -27,55 +27,55 @@ describe('matchCriteria', function() {
   it('should match an implicit = operator involving an array', function() {
     expect(matchCriteria({ a: 'z' }, { a: ['x','y','z']})).to.be.true
     expect(matchCriteria({ a: 'a' }, { a: ['x','y','z']})).to.be.false
-    expect(matchCriteria({ }, { a: ['x','y','z']})).to.be.false
+    expect(matchCriteria({}, { a: ['x','y','z']})).to.be.false
   })
 
   it('should match with operator =', function() {
     expect(matchCriteria({ a: 'a' }, { a: { operator: '=', value: 'a' }})).to.be.true
     expect(matchCriteria({ a: 'a' }, { a: { operator: '=', value: 'b' }})).to.be.false
-    expect(matchCriteria({ }, { a: { operator: '=', value: 'b' }})).to.be.false
+    expect(matchCriteria({}, { a: { operator: '=', value: 'b' }})).to.be.false
   })
 
   it('should match with operator >', function() {
     expect(matchCriteria({ a: 5 }, { a: { operator: '>', value: '4' }})).to.be.true
     expect(matchCriteria({ a: 5 }, { a: { operator: '>', value: '5' }})).to.be.false
-    expect(matchCriteria({ }, { a: { operator: '>', value: '5' }})).to.be.false
+    expect(matchCriteria({}, { a: { operator: '>', value: '5' }})).to.be.false
   })
 
   it('should match with operator >=', function() {
     expect(matchCriteria({ a: 5 }, { a: { operator: '>=', value: '5' }})).to.be.true
     expect(matchCriteria({ a: 5 }, { a: { operator: '>=', value: '6' }})).to.be.false
-    expect(matchCriteria({ }, { a: { operator: '>=', value: '6' }})).to.be.false
+    expect(matchCriteria({}, { a: { operator: '>=', value: '6' }})).to.be.false
   })
 
   it('should match with operator <', function() {
     expect(matchCriteria({ a: 5 }, { a: { operator: '<', value: '6' }})).to.be.true
     expect(matchCriteria({ a: 5 }, { a: { operator: '<', value: '5' }})).to.be.false
-    expect(matchCriteria({ }, { a: { operator: '<', value: '5' }})).to.be.false
+    expect(matchCriteria({}, { a: { operator: '<', value: '5' }})).to.be.false
   })
 
   it('should match with operator <=', function() {
     expect(matchCriteria({ a: 5 }, { a: { operator: '<=', value: '5' }})).to.be.true
     expect(matchCriteria({ a: 5 }, { a: { operator: '<=', value: '4' }})).to.be.false
-    expect(matchCriteria({ }, { a: { operator: '<=', value: '4' }})).to.be.false
+    expect(matchCriteria({}, { a: { operator: '<=', value: '4' }})).to.be.false
   })
 
   it('should match with operator <>', function() {
     expect(matchCriteria({ a: 'a' }, { a: { operator: '<>', value: 'aa' }})).to.be.true
     expect(matchCriteria({ a: 'a' }, { a: { operator: '<>', value: 'a' }})).to.be.false
-    expect(matchCriteria({ }, { a: { operator: '<>', value: 'a' }})).to.be.false
+    expect(matchCriteria({}, { a: { operator: '<>', value: 'a' }})).to.be.false
   })
 
   it('should match with operator !=', function() {
     expect(matchCriteria({ a: 'a' }, { a: { operator: '!=', value: 'aa' }})).to.be.true
     expect(matchCriteria({ a: 'a' }, { a: { operator: '!=', value: 'a' }})).to.be.false
-    expect(matchCriteria({ }, { a: { operator: '!=', value: 'a' }})).to.be.false
+    expect(matchCriteria({}, { a: { operator: '!=', value: 'a' }})).to.be.false
   })
 
   it('should match with operator IN', function() {
     expect(matchCriteria({ a: 'a' }, { a: { operator: 'IN', value: ['a'] }})).to.be.true
     expect(matchCriteria({ a: 'a' }, { a: { operator: 'IN', value: ['aa'] }})).to.be.false
-    expect(matchCriteria({ }, { a: { operator: 'IN', value: ['aa'] }})).to.be.false
+    expect(matchCriteria({}, { a: { operator: 'IN', value: ['aa'] }})).to.be.false
   })
 
   it('should match with operator IS NULL', function() {
@@ -105,7 +105,7 @@ describe('matchCriteria', function() {
     expect(matchCriteria({ a: 'ab' }, { a: { operator: 'LIKE', value: 'b%' }})).to.be.false
     expect(matchCriteria({ a: 'ab' }, { a: { operator: 'LIKE', value: '%b' }})).to.be.true
     expect(matchCriteria({ a: 'ab' }, { a: { operator: 'LIKE', value: '%b%' }})).to.be.true
-    expect(matchCriteria({ }, { a: { operator: 'LIKE', value: '%a%' }})).to.be.false
+    expect(matchCriteria({}, { a: { operator: 'LIKE', value: '%a%' }})).to.be.false
   })
 
   it('should accept multiple operator objects for one property', function() {
@@ -118,6 +118,8 @@ describe('matchCriteria', function() {
     expect(matchCriteria({ a: 'b', b: 1 }, { a: ['a', 'b'], b: 1 })).to.be.true
     expect(matchCriteria({ a: 'a', b: 2 }, { a: ['a', 'b'], b: 1 })).to.be.false
     expect(matchCriteria({ a: 'b', b: 2 }, { a: ['a', 'b'], b: 1 })).to.be.false
+    expect(matchCriteria({ a: 'c', b: 1 }, { a: ['a', 'b'], b: 1 })).to.be.false
+    expect(matchCriteria({ a: 'c', b: 2 }, { a: ['a', 'b'], b: 1 })).to.be.false
   })
 
   it('should match an array of objects', function() {
@@ -163,17 +165,19 @@ describe('matchCriteria', function() {
     expect(matchCriteria({ className: 'A', a: '123' }, { a: '4' }, customMatcher)).to.be.false
   })
 
-  it('should use a custom matcher when property does not exist on the object', function() {
+  it('should match with the custom matcher and the other criteria', function() {
     let customMatcher: CustomMatcher = {
       'A': [
         {
           field: 'a',
-          match: (obj: any, criterium: boolean) => criterium
+          match: (obj: any, criterium: boolean) => { console.log('ADASDASD', obj.a.charCodeAt(0) == criterium); return obj.a.charCodeAt(0) == criterium}
         }
       ]
     }
 
-    expect(matchCriteria({ className: 'A' }, { a: true }, customMatcher)).to.be.true
-    expect(matchCriteria({ className: 'A' }, { a: false }, customMatcher)).to.be.false
+    expect(matchCriteria({ className: 'A', a: 'a', b: 1 }, { a: 97, b: 1 }, customMatcher)).to.be.true
+    expect(matchCriteria({ className: 'A', a: 'a', b: 1 }, { a: 97, b: 2 }, customMatcher)).to.be.false
+    expect(matchCriteria({ className: 'A', a: 'b', b: 1 }, { a: 97, b: 1 }, customMatcher)).to.be.false
+    expect(matchCriteria({ className: 'A', a: 'b', b: 2 }, { a: 97, b: 1 }, customMatcher)).to.be.false
   })
 })
