@@ -149,7 +149,7 @@ describe('matchCriteria', function() {
     expect(matchCriteria({ a: { b: [{ c: 2 }, { c: 1 }] }}, { a: { b: { c: 3 }}})).to.be.false
   })
 
-  it('should use a custom matcher based on className property', function() {
+  it('should use a custom matcher', function() {
     let customMatcher: CustomMatcher = {
       'A': [
         {
@@ -161,5 +161,19 @@ describe('matchCriteria', function() {
 
     expect(matchCriteria({ className: 'A', a: '123' }, { a: '1' }, customMatcher)).to.be.true
     expect(matchCriteria({ className: 'A', a: '123' }, { a: '4' }, customMatcher)).to.be.false
+  })
+
+  it('should use a custom matcher when property does not exist on the object', function() {
+    let customMatcher: CustomMatcher = {
+      'A': [
+        {
+          field: 'a',
+          match: (obj: any, criterium: boolean) => criterium
+        }
+      ]
+    }
+
+    expect(matchCriteria({ className: 'A' }, { a: true }, customMatcher)).to.be.true
+    expect(matchCriteria({ className: 'A' }, { a: false }, customMatcher)).to.be.false
   })
 })

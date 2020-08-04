@@ -18,6 +18,31 @@ export function matchCriteria(obj: any, criteria: DbCriteria|undefined, customMa
       return true
     }
 
+    if (customMatcher != undefined) {
+      let className: string
+      
+      if (obj.className != undefined) {  
+        className = obj.className
+      }
+      else {
+        className = obj.constructor.name
+      }
+      
+      let customMatcherForClass = customMatcher[className]
+      
+      let fieldMatcher = undefined
+      for (let matcher of customMatcherForClass) {
+        if (matcher.field == field) {
+          fieldMatcher = matcher
+          break
+        }
+      }
+
+      if (fieldMatcher != undefined) {
+        return fieldMatcher.match(obj, criterium)
+      }
+    }
+
     if (value === undefined) {
       return false
     }
@@ -85,32 +110,6 @@ export function matchCriteria(obj: any, criteria: DbCriteria|undefined, customMa
       }
     }
     else {
-      let fieldMatcher = undefined
-
-      if (customMatcher != undefined) {
-        let className: string
-
-        if (obj.className != undefined) {  
-          className = obj.className
-        }
-        else {
-          className = obj.constructor.name
-        }
-
-        let customMatcherForClass = customMatcher[className]
-
-        for (let matcher of customMatcherForClass) {
-          if (matcher.field == field) {
-            fieldMatcher = matcher
-            break
-          }
-        }
-      }
-
-      if (fieldMatcher != undefined) {
-        return fieldMatcher.match(obj, criterium)
-      }
-
       return matchValue(value, criterium, operator)
     }
   }
