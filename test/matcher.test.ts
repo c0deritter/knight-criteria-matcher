@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import 'mocha'
-import { matchCriteria, CustomMatcher } from '../src/matcher'
+import { CustomMatcher, matchCriteria } from '../src/matcher'
 
 describe('matchCriteria', function() {
   it('should match an implicit = operator', function() {
@@ -161,8 +161,8 @@ describe('matchCriteria', function() {
       ]
     }
 
-    expect(matchCriteria({ className: 'A', a: '123' }, { a: '1' }, customMatcher)).to.be.true
-    expect(matchCriteria({ className: 'A', a: '123' }, { a: '4' }, customMatcher)).to.be.false
+    expect(matchCriteria(new A('123'), { a: '1' }, customMatcher)).to.be.true
+    expect(matchCriteria(new A('123'), { a: '4' }, customMatcher)).to.be.false
   })
 
   it('should match with the custom matcher and the other criteria', function() {
@@ -170,14 +170,18 @@ describe('matchCriteria', function() {
       'A': [
         {
           field: 'a',
-          match: (obj: any, criterium: boolean) => { console.log('ADASDASD', obj.a.charCodeAt(0) == criterium); return obj.a.charCodeAt(0) == criterium}
+          match: (obj: any, criterium: boolean) => obj.a.charCodeAt(0) == criterium
         }
       ]
     }
 
-    expect(matchCriteria({ className: 'A', a: 'a', b: 1 }, { a: 97, b: 1 }, customMatcher)).to.be.true
-    expect(matchCriteria({ className: 'A', a: 'a', b: 1 }, { a: 97, b: 2 }, customMatcher)).to.be.false
-    expect(matchCriteria({ className: 'A', a: 'b', b: 1 }, { a: 97, b: 1 }, customMatcher)).to.be.false
-    expect(matchCriteria({ className: 'A', a: 'b', b: 2 }, { a: 97, b: 1 }, customMatcher)).to.be.false
+    expect(matchCriteria(new A('a', 1), { a: 97, b: 1 }, customMatcher)).to.be.true
+    expect(matchCriteria(new A('a', 1), { a: 97, b: 2 }, customMatcher)).to.be.false
+    expect(matchCriteria(new A('b', 1), { a: 97, b: 1 }, customMatcher)).to.be.false
+    expect(matchCriteria(new A('b', 2), { a: 97, b: 1 }, customMatcher)).to.be.false
   })
 })
+
+class A {
+  constructor(public a: string, public b?: number) {}
+}

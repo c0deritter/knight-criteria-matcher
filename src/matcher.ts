@@ -27,25 +27,19 @@ export function matchCriteria(obj: any, criteria: DbCriteria|undefined, customMa
 
     // look if there is a custom matcher for the given class/field combination
     if (customMatcher != undefined) {
-      let className: string
-      
-      if (obj.className != undefined) {  
-        className = obj.className
-      }
-      else {
-        className = obj.constructor.name
-      }
-      
+      let className = obj.constructor.name
       let customMatchersForClass = customMatcher[className]
-      
       let fieldMatcher = undefined
-      for (let matcher of customMatchersForClass) {
-        if (matcher.field == field) {
-          fieldMatcher = matcher
-          break
-        }
-      }
 
+      if (customMatchersForClass != undefined) {
+        for (let matcher of customMatchersForClass) {
+          if (matcher.field == field) {
+            fieldMatcher = matcher
+            break
+          }
+        }  
+      }
+      
       // console.log('fieldMatcher', fieldMatcher)
 
       // if there is a field matcher and it does not match then return false. otherwise just continue to the
