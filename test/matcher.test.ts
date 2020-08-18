@@ -24,6 +24,8 @@ describe('matchCriteria', function() {
     expect(matchCriteria({ a: 'a' }, { a: 'NULL' })).to.be.false
     expect(matchCriteria({ a: { b: 'b' }}, { a: null })).to.be.false
     expect(matchCriteria({ a: { b: 'b' }}, { a: 'NULL' })).to.be.false
+    expect(matchCriteria({ a: new Date}, { a: null })).to.be.false
+    expect(matchCriteria({ a: new Date}, { a: 'NULL' })).to.be.false
   })
 
   it('should match an implicit = operator involving an array', function() {
@@ -89,6 +91,8 @@ describe('matchCriteria', function() {
     expect(matchCriteria({ a: 'a' }, { a: { operator: 'IS', value: 'NULL' }})).to.be.false
     expect(matchCriteria({ a: { b: 'b' }}, { a: { operator: 'IS', value: null }})).to.be.false
     expect(matchCriteria({ a: { b: 'b' }}, { a: { operator: 'IS', value: 'NULL' }})).to.be.false
+    expect(matchCriteria({ a: new Date}, { a: { operator: 'IS', value: null }})).to.be.false
+    expect(matchCriteria({ a: new Date}, { a: { operator: 'IS', value: 'NULL' }})).to.be.false
   })
 
   it('should match with operator IS NOT NULL', function() {
@@ -100,6 +104,8 @@ describe('matchCriteria', function() {
     expect(matchCriteria({ a: 'a' }, { a: { operator: 'IS NOT', value: 'NULL' }})).to.be.true
     expect(matchCriteria({ a: { b: 'b' }}, { a: { operator: 'IS NOT', value: null }})).to.be.true
     expect(matchCriteria({ a: { b: 'a' }}, { a: { operator: 'IS NOT', value: 'NULL' }})).to.be.true
+    expect(matchCriteria({ a: new Date}, { a: { operator: 'IS NOT', value: null }})).to.be.true
+    expect(matchCriteria({ a: new Date}, { a: { operator: 'IS NOT', value: 'NULL' }})).to.be.true
   })
 
   it('should match with operator LIKE', function() {
@@ -131,6 +137,12 @@ describe('matchCriteria', function() {
   it('should match an array of objects', function() {
     expect(matchCriteria({ a: [{ b: 2 }, { b: 1 }] }, { a: { b: 1 } })).to.be.true
     expect(matchCriteria({ a: [{ b: 2 }, { b: 1 }] }, { a: { b: 3 } })).to.be.false
+    expect(matchCriteria({ a: [{ b: 2 }, { b: 1 }] }, { a: { b: null } })).to.be.false
+    expect(matchCriteria({ a: [{ b: 2 }, { b: 1 }] }, { a: { b: 'NULL' } })).to.be.false
+    expect(matchCriteria({ a: [{ b: { c: 'c' }}, { b: { c: 'c' }}] }, { a: { b: null } })).to.be.false
+    expect(matchCriteria({ a: [{ b: { c: 'c' }}, { b: { c: 'c' }}] }, { a: { b: 'NULL' } })).to.be.false
+    expect(matchCriteria({ a: [{ b: null }, { b: 1 }] }, { a: { b: null } })).to.be.true
+    expect(matchCriteria({ a: [{ b: 2 }, { b: null }] }, { a: { b: 'NULL' } })).to.be.true
   })
 
   it('should match the array length', function() {
