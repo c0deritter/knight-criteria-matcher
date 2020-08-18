@@ -22,6 +22,8 @@ describe('matchCriteria', function() {
     expect(matchCriteria({}, { a: 'NULL' })).to.be.false
     expect(matchCriteria({ a: 'a' }, { a: null })).to.be.false
     expect(matchCriteria({ a: 'a' }, { a: 'NULL' })).to.be.false
+    expect(matchCriteria({ a: { b: 'b' }}, { a: null })).to.be.false
+    expect(matchCriteria({ a: { b: 'b' }}, { a: 'NULL' })).to.be.false
   })
 
   it('should match an implicit = operator involving an array', function() {
@@ -85,6 +87,8 @@ describe('matchCriteria', function() {
     expect(matchCriteria({  }, { a: { operator: 'IS', value: 'NULL' }})).to.be.false
     expect(matchCriteria({ a: 'a' }, { a: { operator: 'IS', value: null }})).to.be.false
     expect(matchCriteria({ a: 'a' }, { a: { operator: 'IS', value: 'NULL' }})).to.be.false
+    expect(matchCriteria({ a: { b: 'b' }}, { a: { operator: 'IS', value: null }})).to.be.false
+    expect(matchCriteria({ a: { b: 'b' }}, { a: { operator: 'IS', value: 'NULL' }})).to.be.false
   })
 
   it('should match with operator IS NOT NULL', function() {
@@ -94,6 +98,8 @@ describe('matchCriteria', function() {
     expect(matchCriteria({  }, { a: { operator: 'IS NOT', value: 'NULL' }})).to.be.false
     expect(matchCriteria({ a: 'a' }, { a: { operator: 'IS NOT', value: null }})).to.be.true
     expect(matchCriteria({ a: 'a' }, { a: { operator: 'IS NOT', value: 'NULL' }})).to.be.true
+    expect(matchCriteria({ a: { b: 'b' }}, { a: { operator: 'IS NOT', value: null }})).to.be.true
+    expect(matchCriteria({ a: { b: 'a' }}, { a: { operator: 'IS NOT', value: 'NULL' }})).to.be.true
   })
 
   it('should match with operator LIKE', function() {

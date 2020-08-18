@@ -1,10 +1,12 @@
 import { DbCriteria } from 'mega-nice-db-query-parameter'
 
 export function matchCriteria(obj: any, criteria: DbCriteria|undefined, customMatcher?: CustomMatcher): boolean {
+  // console.log('Entering matchCriteria...')
   // console.log('obj', obj)
   // console.log('criteria', criteria)
 
-  if (criteria == undefined) {
+  if (criteria === undefined) {
+    // console.log('Criteria are undefined. No criteria do match. Returning true...')
     return true
   }
 
@@ -27,6 +29,8 @@ export function matchCriteria(obj: any, criteria: DbCriteria|undefined, customMa
 
     // look if there is a custom matcher for the given class/field combination
     if (customMatcher != undefined) {
+      // console.log('Looking for custom matcher...')
+
       let className = obj.constructor.name
       let customMatchersForClass = customMatcher[className]
       let fieldMatcher = undefined
@@ -68,7 +72,7 @@ export function matchCriteria(obj: any, criteria: DbCriteria|undefined, customMa
       // console.log('Value is of type array')
       // if the array is empty we cannot match anything thus no criterium will match. Just return false in this case.
       // check if there is an arrayLength property which we have to evaluate manually
-      if (typeof criterium == 'object' && 'arrayLength' in criterium) {
+      if (typeof criterium == 'object' && criterium !== null && 'arrayLength' in criterium) {
         if (! matchValue(value.length, criterium.arrayLength)) {
           return false
         }
@@ -117,26 +121,22 @@ export function matchCriteria(obj: any, criteria: DbCriteria|undefined, customMa
       }
     }
 
-    // if the value is an object we just go into the recursion
-    if (typeof value == 'object' && value !== null) {
-      if (! matchCriteria(value, criterium)) {
-        return false
-      }
-      else {
-        continue
-      }
-    }
-
     // if the criterium is an object then we assume it is one that has an operator and a value property and we
     // set the corresponding variables accordingly
     if (typeof criterium == 'object' && criterium !== null && typeof criterium.operator == 'string' && criterium.value !== undefined) {
+      // console.log('Extracting the operator and the criterium from the given criteria object...')
       operator = (<string>criterium.operator).toUpperCase()
       criterium = criterium.value
+
+      // console.log('operator', operator)
+      // console.log('criterium', criterium)
     }
 
     // support a written NULL instead of the JavaScript null
     if (typeof criterium == 'string' && criterium.toUpperCase() == 'NULL') {
+      // console.log('The given criterium is NULL. Convert it to JavaScript null...')
       criterium = null
+      // console.log('criterium', criterium)
     }
 
     // if the criterium is an array we assume that it is an array consisting of single values or objects
@@ -173,11 +173,25 @@ export function matchCriteria(obj: any, criteria: DbCriteria|undefined, customMa
         }
       }
     }
+    // if the value is an object we just go into the recursion
+    else if (typeof value == 'object' && value !== null && typeof criterium == 'object' && criterium !== null) {
+      // console.log('Value is an object. Entering recursion...')
+
+      if (! matchCriteria(value, criterium)) {
+        // console.log('Leaving recursion. Object did not match the criteria. Returning false...')
+        return false
+      }
+      else {
+        // console.log('Leaving recursion. Object did match the criteria. Continuing...')
+        continue
+      }
+    }
     else if (! matchValue(value, criterium, operator)) {
       return false
     }
   }
 
+  // console.log('Iterated through all criteria without returning false. Returning true...')
   return true
 }
 
