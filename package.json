@@ -1,23 +1,23 @@
 {
-  "name": "mega-nice-db-query-parameter-matcher",
-  "version": "3.3.5",
+  "name": "mega-nice-db-criteria-matcher",
+  "version": "4.0.0",
   "description": "",
-  "main": "lib/matcher.js",
-  "types": "lib/matcher.d.ts",
+  "main": "lib/criteriaMatcher.js",
+  "types": "lib/criteriaMatcher.d.ts",
   "files": [
     "lib/**/*"
   ],
   "dependencies": {
-    "mega-nice-db-query-parameter": "^1.0.2"
+    "mega-nice-db-criteria": "^2.0.3"
   },
   "devDependencies": {
-    "@types/chai": "^4.2.7",
+    "@types/chai": "^4.2.12",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^14.0.24",
+    "@types/node": "^14.6.4",
     "chai": "^4.2.0",
-    "mocha": "^6.2.2",
-    "ts-node": "^8.5.4",
-    "typescript": "^3.7.4"
+    "mocha": "^6.2.3",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.7"
   },
   "scripts": {
     "test": "mocha -r ts-node/register \"test/**/*.test.ts\"",
@@ -25,14 +25,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/c0deritter/mega-nice-db-query-parameter-matcher.git"
+    "url": "git+https://github.com/c0deritter/mega-nice-db-criteria-matcher.git"
   },
   "keywords": [
     ""
   ],
   "author": "Coderitter GmbH",
   "bugs": {
-    "url": "https://github.com/c0deritter/mega-nice-db-query-parameter-matcher/issues"
+    "url": "https://github.com/c0deritter/mega-nice-db-criteria-matcher/issues"
   },
-  "homepage": "https://github.com/c0deritter/mega-nice-db-query-parameter-matcher#readme"
+  "homepage": "https://github.com/c0deritter/mega-nice-db-criteria-matcher#readme"
 }

@@ -1,4 +1,4 @@
-import { DbCriteria } from 'mega-nice-db-query-parameter'
+import { DbCriteria } from 'mega-nice-db-criteria'
 
 export function matchCriteria(obj: any, criteria: DbCriteria|undefined, customMatcher?: CustomMatcher): boolean {
   // console.log('Entering matchCriteria...')
