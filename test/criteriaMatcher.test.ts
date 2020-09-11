@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import 'mocha'
-import { CustomMatcher, matchCriteria } from '../src/matcher'
+import { CustomMatcher, matchCriteria } from '../src/criteriaMatcher'
 
 describe('matchCriteria', function() {
   it('should match an implicit = operator', function() {

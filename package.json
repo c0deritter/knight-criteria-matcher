@@ -1,5 +1,5 @@
 {
-  "name": "mega-nice-db-criteria-matcher",
+  "name": "mega-nice-criteria-matcher",
   "version": "4.0.0",
   "description": "",
   "main": "lib/criteriaMatcher.js",
@@ -8,7 +8,7 @@
     "lib/**/*"
   ],
   "dependencies": {
-    "mega-nice-db-criteria": "^2.0.3"
+    "mega-nice-criteria": "^3.0.0"
   },
   "devDependencies": {
     "@types/chai": "^4.2.12",
@@ -25,14 +25,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/c0deritter/mega-nice-db-criteria-matcher.git"
+    "url": "git+https://github.com/c0deritter/mega-nice-criteria-matcher.git"
   },
   "keywords": [
     ""
   ],
   "author": "Coderitter GmbH",
   "bugs": {
-    "url": "https://github.com/c0deritter/mega-nice-db-criteria-matcher/issues"
+    "url": "https://github.com/c0deritter/mega-nice-criteria-matcher/issues"
   },
-  "homepage": "https://github.com/c0deritter/mega-nice-db-criteria-matcher#readme"
+  "homepage": "https://github.com/c0deritter/mega-nice-criteria-matcher#readme"
 }

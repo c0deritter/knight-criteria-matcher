@@ -1,6 +1,6 @@
-import { DbCriteria } from 'mega-nice-db-criteria'
+import { Criteria } from 'mega-nice-criteria'
 
-export function matchCriteria(obj: any, criteria: DbCriteria|undefined, customMatcher?: CustomMatcher): boolean {
+export function matchCriteria(obj: any, criteria: Criteria|undefined, customMatcher?: CustomMatcher): boolean {
   // console.log('Entering matchCriteria...')
   // console.log('obj', obj)
   // console.log('criteria', criteria)
