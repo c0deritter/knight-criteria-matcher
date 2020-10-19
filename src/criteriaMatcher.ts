@@ -12,20 +12,20 @@ export function matchCriteria(obj: any, criteria: Criteria|undefined, customMatc
 
   for (let field in criteria) {
     // console.log('field', field)
-    if (field == 'orderBy' || field == 'limit' || field == 'offset' || field == 'arrayLength') {
+    if (field == '@orderBy' || field == '@limit' || field == '@offset' || field == '@count') {
       continue
     }
 
     let value = obj[field]
     let criterium = criteria[field]
     let operator: string|undefined = undefined
-    // the value is assumed to be an array as soon as the correspoding criterium contains the arrayLength property
-    let criteriumContainsArrayLength = criterium !== null && typeof criterium == 'object' && 'arrayLength' in criterium
+    // the value is assumed to be an array as soon as the correspoding criterium contains the @count property
+    let criteriumContainsCount = criterium !== null && typeof criterium == 'object' && '@count' in criterium
 
     // console.log('value', value)
     // console.log('criterium', criterium)
     // console.log('operator', operator)
-    // console.log('criteriumContainsArrayLength', criteriumContainsArrayLength)
+    // console.log('criteriumContainsCount', criteriumContainsCount)
 
     // look if there is a custom matcher for the given class/field combination
     if (customMatcher != undefined) {
@@ -62,7 +62,7 @@ export function matchCriteria(obj: any, criteria: Criteria|undefined, customMatc
 
     // if the value is exactly undefined and the value is not supposed to be an array then we can return false
     // because an undefined value cannot be checked against anything valid.
-    if (value === undefined && ! criteriumContainsArrayLength) {
+    if (value === undefined && ! criteriumContainsCount) {
       // console.log('Value is undefined and not ought to be an array. Returning false...')
       return false
     }
@@ -71,15 +71,15 @@ export function matchCriteria(obj: any, criteria: Criteria|undefined, customMatc
     if (value instanceof Array) {
       // console.log('Value is of type array')
       // if the array is empty we cannot match anything thus no criterium will match. Just return false in this case.
-      // check if there is an arrayLength property which we have to evaluate manually
-      if (typeof criterium == 'object' && criterium !== null && 'arrayLength' in criterium) {
-        if (! matchValue(value.length, criterium.arrayLength)) {
+      // check if there is an @count property which we have to evaluate manually
+      if (typeof criterium == 'object' && criterium !== null && '@count' in criterium) {
+        if (! matchValue(value.length, criterium['@count'])) {
           return false
         }
 
-        // clone criterium and remove arrayLength
+        // clone criterium and remove @count
         criterium = { ...criterium }
-        delete criterium.arrayLength
+        delete criterium['@count']
 
         // console.log('cloned criterium', criterium)
 
@@ -90,7 +90,7 @@ export function matchCriteria(obj: any, criteria: Criteria|undefined, customMatc
         }
       }
 
-      // if there was an arrayLength and we are still here that means that the length was correct.
+      // if there was an @count and we are still here that means that the length was correct.
       // now check if there is at least one element that matches.
       let atLeastOneElementMatched = false
 
@@ -112,8 +112,8 @@ export function matchCriteria(obj: any, criteria: Criteria|undefined, customMatc
       }
     }
     // if the value should have been an array but it is not we return false if the wished length was not 0
-    else if (criteriumContainsArrayLength) {
-      if (criterium.arrayLength !== 0) {
+    else if (criteriumContainsCount) {
+      if (criterium['@count'] !== 0) {
         return false
       }
       else {
