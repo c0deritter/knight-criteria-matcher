@@ -10,9 +10,12 @@ export function matchCriteria(obj: any, criteria: Criteria|undefined, customMatc
     return true
   }
 
+  let not = criteria['@not'] === true
+  // console.log('not', not)
+
   for (let field in criteria) {
     // console.log('field', field)
-    if (field == '@orderBy' || field == '@limit' || field == '@offset' || field == '@count') {
+    if (field == '@orderBy' || field == '@limit' || field == '@offset' || field == '@count' || field == '@not') {
       continue
     }
 
@@ -51,7 +54,7 @@ export function matchCriteria(obj: any, criteria: Criteria|undefined, customMatc
       if (fieldMatcher != undefined) {
         if (! fieldMatcher.match(obj, criterium)) {
           // console.log('Custom field matcher did not match. Returning false...')
-          return false
+          return not != false
         }
         else {
           // console.log('Custom field matcher did match. Continuing...')
@@ -64,7 +67,7 @@ export function matchCriteria(obj: any, criteria: Criteria|undefined, customMatc
     // because an undefined value cannot be checked against anything valid.
     if (value === undefined && ! criteriumContainsCount) {
       // console.log('Value is undefined and not ought to be an array. Returning false...')
-      return false
+      return not != false
     }
     
     // if the value is an array go through the elements of that array one by one looking for at least one match
@@ -74,7 +77,7 @@ export function matchCriteria(obj: any, criteria: Criteria|undefined, customMatc
       // check if there is an @count property which we have to evaluate manually
       if (typeof criterium == 'object' && criterium !== null && '@count' in criterium) {
         if (! matchValue(value.length, criterium['@count'])) {
-          return false
+          return not != false
         }
 
         // clone criterium and remove @count
@@ -105,7 +108,7 @@ export function matchCriteria(obj: any, criteria: Criteria|undefined, customMatc
 
       // if not one element matched we can return false
       if (! atLeastOneElementMatched) {
-        return false
+        return not != false
       }
       else {
         continue
@@ -114,7 +117,7 @@ export function matchCriteria(obj: any, criteria: Criteria|undefined, customMatc
     // if the value should have been an array but it is not we return false if the wished length was not 0
     else if (criteriumContainsCount) {
       if (criterium['@count'] !== 0) {
-        return false
+        return not != false
       }
       else {
         continue
@@ -153,7 +156,7 @@ export function matchCriteria(obj: any, criteria: Criteria|undefined, customMatc
 
           if (! matchValue(value, criteriumObj.value, criteriumObj.operator)) {
             // console.log('Criterium did not match. Returning false...')
-            return false
+            return not != false
           }
         }
         else {
@@ -169,7 +172,7 @@ export function matchCriteria(obj: any, criteria: Criteria|undefined, customMatc
       if (! consistsOfCriteriumObjects) {
         if (! matchValue(value, criterium)) {
           // console.log('Criterium did not match. Returning false...')
-          return false
+          return not != false
         }
       }
     }
@@ -179,7 +182,7 @@ export function matchCriteria(obj: any, criteria: Criteria|undefined, customMatc
 
       if (! matchCriteria(value, criterium)) {
         // console.log('Leaving recursion. Object did not match the criteria. Returning false...')
-        return false
+        return not != false
       }
       else {
         // console.log('Leaving recursion. Object did match the criteria. Continuing...')
@@ -187,12 +190,12 @@ export function matchCriteria(obj: any, criteria: Criteria|undefined, customMatc
       }
     }
     else if (! matchValue(value, criterium, operator)) {
-      return false
+      return not != false
     }
   }
 
   // console.log('Iterated through all criteria without returning false. Returning true...')
-  return true
+  return not != true
 }
 
 export function matchValue(value: any, criterium: any, operator?: string): boolean {
