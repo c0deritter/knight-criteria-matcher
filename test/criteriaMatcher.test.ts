@@ -281,6 +281,37 @@ describe('matchCriteria', function() {
     expect(matchCriteria({ a: { b: [{ c: 2 }, { c: 1 }] }}, { '@not': true, a: { b: { c: 3 }}})).to.be.true
   })
 
+  it.only('should match a date', function() {
+    let now = new Date
+    let nowMinusOneYear = new Date(now.getFullYear() - 1, now.getMonth())
+
+    expect(matchCriteria({ a: now }, { a: now })).to.be.true
+    expect(matchCriteria({ a: now }, { a: nowMinusOneYear })).to.be.false
+    expect(matchCriteria({ a: now }, { a: { operator: '>', value: now }})).to.be.false
+    expect(matchCriteria({ a: now }, { a: { operator: '>', value: nowMinusOneYear }})).to.be.true
+    expect(matchCriteria({ a: now }, { a: { operator: '>=', value: now }})).to.be.true
+    expect(matchCriteria({ a: now }, { a: { operator: '>=', value: nowMinusOneYear }})).to.be.true
+    expect(matchCriteria({ a: now }, { a: { operator: '<', value: now }})).to.be.false
+    expect(matchCriteria({ a: now }, { a: { operator: '<', value: nowMinusOneYear }})).to.be.false
+    expect(matchCriteria({ a: now }, { a: { operator: '<=', value: now }})).to.be.true
+    expect(matchCriteria({ a: now }, { a: { operator: '<=', value: nowMinusOneYear }})).to.be.false
+    expect(matchCriteria({ a: now }, { a: { operator: 'IN', value: [ now ] }})).to.be.true
+    expect(matchCriteria({ a: now }, { a: { operator: 'IN', value: [ nowMinusOneYear ] }})).to.be.false
+
+    expect(matchCriteria({ a: now }, { '@not': true, a: now })).to.be.false
+    expect(matchCriteria({ a: now }, { '@not': true, a: nowMinusOneYear })).to.be.true
+    expect(matchCriteria({ a: now }, { '@not': true, a: { operator: '>', value: now }})).to.be.true
+    expect(matchCriteria({ a: now }, { '@not': true, a: { operator: '>', value: nowMinusOneYear }})).to.be.false
+    expect(matchCriteria({ a: now }, { '@not': true, a: { operator: '>=', value: now }})).to.be.false
+    expect(matchCriteria({ a: now }, { '@not': true, a: { operator: '>=', value: nowMinusOneYear }})).to.be.false
+    expect(matchCriteria({ a: now }, { '@not': true, a: { operator: '<', value: now }})).to.be.true
+    expect(matchCriteria({ a: now }, { '@not': true, a: { operator: '<', value: nowMinusOneYear }})).to.be.true
+    expect(matchCriteria({ a: now }, { '@not': true, a: { operator: '<=', value: now }})).to.be.false
+    expect(matchCriteria({ a: now }, { '@not': true, a: { operator: '<=', value: nowMinusOneYear }})).to.be.true
+    expect(matchCriteria({ a: now }, { '@not': true, a: { operator: 'IN', value: [ now ] }})).to.be.false
+    expect(matchCriteria({ a: now }, { '@not': true, a: { operator: 'IN', value: [ nowMinusOneYear ] }})).to.be.true
+  })
+
   it('should use a custom matcher', function() {
     let customMatcher: CustomMatcher = {
       'A': [

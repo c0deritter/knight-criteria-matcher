@@ -1,6 +1,6 @@
 {
   "name": "mega-nice-criteria-matcher",
-  "version": "5.1.0",
+  "version": "5.2.0",
   "description": "",
   "main": "lib/criteriaMatcher.js",
   "types": "lib/criteriaMatcher.d.ts",

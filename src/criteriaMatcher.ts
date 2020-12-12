@@ -177,7 +177,7 @@ export function matchCriteria(obj: any, criteria: Criteria|undefined, customMatc
       }
     }
     // if the value is an object we just go into the recursion
-    else if (typeof value == 'object' && value !== null && typeof criterium == 'object' && criterium !== null) {
+    else if (typeof value == 'object' && value !== null && ! (value instanceof Date) && typeof criterium == 'object' && criterium !== null) {
       // console.log('Value is an object. Entering recursion...')
 
       if (! matchCriteria(value, criterium)) {
@@ -204,12 +204,32 @@ export function matchValue(value: any, criterium: any, operator?: string): boole
   // console.log('matchValue > criterium', criterium)
   // console.log('matchValue > operator', operator)
 
+  let isDate = false
+  if (value instanceof Date) {
+    value = value.getTime()
+    isDate = true
+
+    if (criterium instanceof Date) {
+      criterium = criterium.getTime()
+    }
+  }
+
   if (criterium instanceof Array && operator == undefined) {
     operator = 'IN'
   }
 
   if (operator == undefined || operator == '=') {
     return value === criterium
+  }
+
+  if (isDate && criterium instanceof Array) {
+    criterium = criterium.slice()
+
+    for (let i = 0; i < criterium.length; i++) {
+      if (criterium[i] instanceof Date) {
+        criterium[i] = criterium[i].getTime()
+      }
+    }  
   }
 
   switch (operator) {
