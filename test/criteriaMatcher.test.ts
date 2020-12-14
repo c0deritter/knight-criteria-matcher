@@ -197,12 +197,20 @@ describe('matchCriteria', function() {
     expect(matchCriteria({}, { a: { operator: 'LIKE', value: '%a%' }})).to.be.false
   })
 
-  it('should accept multiple operator objects for one property', function() {
-    expect(matchCriteria({ a: 5 }, { a: [{ operator: '>', value: 3 }, { operator: '<', value: 6 }]})).to.be.true
-    expect(matchCriteria({ a: 1 }, { a: [{ operator: '>', value: 3 }, { operator: '<', value: 6 }]})).to.be.false
+  // it('should accept multiple operator objects for one property connected by and', function() {
+  //   expect(matchCriteria({ a: 5 }, { a: [{ operator: '>', value: 3 }, '@and', { operator: '<', value: 6 }]})).to.be.true
+  //   expect(matchCriteria({ a: 1 }, { a: [{ operator: '>', value: 3 }, '@and', { operator: '<', value: 6 }]})).to.be.false
 
-    expect(matchCriteria({ a: 5 }, { '@not': true, a: [{ operator: '>', value: 3 }, { '@not': true, operator: '<', value: 6 }]})).to.be.false
-    expect(matchCriteria({ a: 1 }, { '@not': true, a: [{ operator: '>', value: 3 }, { operator: '<', value: 6 }]})).to.be.true
+  //   expect(matchCriteria({ a: 5 }, { '@not': true, a: [{ operator: '>', value: 3 }, '@and', { operator: '<', value: 6 }]})).to.be.false
+  //   expect(matchCriteria({ a: 1 }, { '@not': true, a: [{ operator: '>', value: 3 }, '@and', { operator: '<', value: 6 }]})).to.be.true
+  // })
+
+  it('should accept multiple operator objects combined with simple values for one property', function() {
+    expect(matchCriteria({ a: 5 }, { a: [ 3, { operator: '<', value: 6 }]})).to.be.true
+    expect(matchCriteria({ a: 1 }, { a: [{ operator: '>', value: 3 }, 6 ]})).to.be.false
+
+    expect(matchCriteria({ a: 5 }, { '@not': true, a: [ 3, { operator: '<', value: 6 }]})).to.be.false
+    expect(matchCriteria({ a: 1 }, { '@not': true, a: [{ operator: '>', value: 3 }, 6 ]})).to.be.true
   })
 
   it('should match multiple connected criteria', function() {
@@ -281,7 +289,7 @@ describe('matchCriteria', function() {
     expect(matchCriteria({ a: { b: [{ c: 2 }, { c: 1 }] }}, { '@not': true, a: { b: { c: 3 }}})).to.be.true
   })
 
-  it.only('should match a date', function() {
+  it('should match a date', function() {
     let now = new Date
     let nowMinusOneYear = new Date(now.getFullYear() - 1, now.getMonth())
 

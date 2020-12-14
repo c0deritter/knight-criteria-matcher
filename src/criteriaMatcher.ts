@@ -143,37 +143,34 @@ export function matchCriteria(obj: any, criteria: Criteria|undefined, customMatc
     }
 
     // if the criterium is an array we assume that it is an array consisting of single values or objects
-    // that have the operator and value property
+    // that have the operator and value property. by default everything in the array is 'or' connected.
     if (criterium instanceof Array) {
       // console.log('Criterium is of type array')
 
+      let oneCriteriumMatches = false
+
       // if the criterium is an array it might be that it consists of criterium objects
-      let consistsOfCriteriumObjects = false
       for (let criteriumObj of criterium) {
         if (typeof criteriumObj == 'object' && criteriumObj !== null && typeof criteriumObj.operator == 'string' && criteriumObj.value !== undefined) {
-          consistsOfCriteriumObjects = true
           // console.log('Evaluating criterum object', criterium)
 
-          if (! matchValue(value, criteriumObj.value, criteriumObj.operator)) {
-            // console.log('Criterium did not match. Returning false...')
-            return not != false
+          if (matchValue(value, criteriumObj.value, criteriumObj.operator)) {
+            // console.log('Criterium did match. Breaking loop...')
+            oneCriteriumMatches = true
+            break
           }
         }
-        else {
-          // if the first element was not a criterium object then we just stop the loop and assume
-          // that the array is an array of values designed to be used with the IN operator
-          // console.log('Criterium array is to be used with IN operator')
+        else if (matchValue(value, criteriumObj)) {
+          // console.log('Criterium did match. Breaking loop...')
+          oneCriteriumMatches = true
           break
         }
       }
 
-      // console.log('consistsOfCriteriumObjects', consistsOfCriteriumObjects)
+      // console.log('oneCriteriumMatches', oneCriteriumMatches)
 
-      if (! consistsOfCriteriumObjects) {
-        if (! matchValue(value, criterium)) {
-          // console.log('Criterium did not match. Returning false...')
-          return not != false
-        }
+      if (! oneCriteriumMatches) {
+        return not != false
       }
     }
     // if the value is an object we just go into the recursion
