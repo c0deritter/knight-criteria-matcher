@@ -1,15 +1,12 @@
 {
-  "name": "mega-nice-criteria-matcher",
-  "version": "5.2.1",
+  "name": "knight-criteria-matcher",
+  "version": "1.0.0",
   "description": "",
   "main": "lib/criteriaMatcher.js",
   "types": "lib/criteriaMatcher.d.ts",
   "files": [
     "lib/**/*"
   ],
-  "dependencies": {
-    "mega-nice-criteria": "^5.3.1"
-  },
   "devDependencies": {
     "@types/chai": "^4.2.14",
     "@types/mocha": "^5.2.7",
@@ -25,14 +22,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/c0deritter/mega-nice-criteria-matcher.git"
+    "url": "git+https://github.com/c0deritter/knight-criteria-matcher.git"
   },
   "keywords": [
     ""
   ],
   "author": "Coderitter GmbH",
   "bugs": {
-    "url": "https://github.com/c0deritter/mega-nice-criteria-matcher/issues"
+    "url": "https://github.com/c0deritter/knight-criteria-matcher/issues"
   },
-  "homepage": "https://github.com/c0deritter/mega-nice-criteria-matcher#readme"
+  "homepage": "https://github.com/c0deritter/knight-criteria-matcher#readme",
+  "dependencies": {
+    "knight-criteria": "^1.0.0"
+  }
 }

@@ -1,4 +1,4 @@
-import { Criteria } from 'mega-nice-criteria'
+import { Criteria } from 'knight-criteria'
 
 export function matchCriteria(obj: any, criteria: Criteria|undefined, customMatcher?: CustomMatcher): boolean {
   // console.log('Entering matchCriteria...')
