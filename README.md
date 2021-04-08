@@ -1,6 +1,6 @@
 # Knight Criteria Matcher by Coderitter
 
-Matches criteria against an object.
+Determines if an object matches given criteria.
 
 ## Related packages
 

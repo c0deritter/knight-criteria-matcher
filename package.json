@@ -1,7 +1,7 @@
 {
   "name": "knight-criteria-matcher",
   "version": "1.0.0",
-  "description": "",
+  "description": "Determines if an object matches given criteria",
   "main": "lib/criteriaMatcher.js",
   "types": "lib/criteriaMatcher.d.ts",
   "files": [
